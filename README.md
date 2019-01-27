@@ -1,3 +1,24 @@
+# To start the task manager. Do the following:
+
+1) Make sure you have npm installed.
+2) Run following commands:
+
+		git clone https://github.com/chiragrtr/TaskManagerReact.git
+		cd TaskManagerReact
+		npm install react-scripts
+		npm start
+		
+3) On http://localhost:3000 you should see the task manager.
+
+# That's All!
+
+
+
+
+
+
+
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 Below you will find some information on how to perform common tasks.<br>
