@@ -5,7 +5,7 @@
 
 		git clone https://github.com/chiragrtr/TaskManagerReact.git
 		cd TaskManagerReact
-		npm install react-scripts
+		npm install
 		npm start
 		
 3) On http://localhost:3000 you should see the task manager.
