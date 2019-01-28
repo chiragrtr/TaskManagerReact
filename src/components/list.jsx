@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import Task from "./task";
 class List extends Component {
   state = {
     taskNames: []
@@ -67,7 +68,7 @@ class List extends Component {
     const button = parentNode.querySelector("button");
     element.className = "hide";
     input.className = "show";
-    button.className = "show";
+    button.className = "show btn btn-sm btn-primary";
     input.focus();
   };
 
@@ -114,28 +115,17 @@ class List extends Component {
     let tasks = [];
     for (let i = 0; i < this.props.list.numOfTasks; i++) {
       tasks.push(
-        <div
-          className="task"
+        <Task
           key={i}
-          onMouseOver={this.showCloseIcon}
-          onMouseOut={this.hideCloseIcon}
-        >
-          <span onClick={this.showInputBox}>
-            {this.state.taskNames[i] || "Click to edit task "}
-          </span>
-          <div className="close hide" onClick={() => this.deleteTask(i)}>
-            x
-          </div>
-          <input
-            className="hide"
-            onBlur={this.hideInputBox}
-            type="text"
-            placeholder={this.state.taskNames[i] || "Enter task description"}
-          />
-          <button className="hide" onClick={e => this.saveTask(e, i)}>
-            Save
-          </button>
-        </div>
+          index={i}
+          showCloseIcon={this.showCloseIcon}
+          hideCloseIcon={this.hideCloseIcon}
+          showInputBox={this.showInputBox}
+          taskName={this.state.taskNames[i]}
+          deleteTask={this.deleteTask}
+          hideInputBox={this.hideInputBox}
+          saveTask={this.saveTask}
+        />
       );
     }
 
