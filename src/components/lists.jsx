@@ -1,8 +1,32 @@
 import React, { Component } from "react";
+import { DragDropContext } from "react-dnd";
+import HTML5Backend from "react-dnd-html5-backend";
 import List from "./list";
+
 class Lists extends Component {
   state = {
     lists: [{ id: 0, numOfTasks: 3 }, { id: 1, numOfTasks: 2 }]
+  };
+
+  componentWillMount = () => {
+    this.addListener("deleteTaskFromList");
+    this.addListener("addTaskToList");
+  };
+
+  componentDidMount = () => {
+    const lists = [...this.state.lists];
+    this.setState({ lists });
+  };
+
+  addListener = eventName => {
+    window.addEventListener(eventName, e => {
+      const lists = [...this.state.lists];
+      const listIndex = lists.findIndex(list => list.id === e.detail.listId);
+      eventName === "addTaskToList"
+        ? lists[listIndex].numOfTasks++
+        : lists[listIndex].numOfTasks--;
+      this.setState({ lists });
+    });
   };
 
   handleTaskAddition = list => {
@@ -37,6 +61,7 @@ class Lists extends Component {
   render() {
     const lists = this.state.lists.map(list => (
       <List
+        listId={list.id}
         key={list.id}
         onTaskAddition={this.handleTaskAddition}
         onTaskDeletion={this.handleTaskDeletion}
@@ -66,4 +91,4 @@ class Lists extends Component {
   }
 }
 
-export default Lists;
+export default DragDropContext(HTML5Backend)(Lists);

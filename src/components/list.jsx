@@ -1,8 +1,57 @@
 import React, { Component } from "react";
 import Task from "./task";
+import { DropTarget } from "react-dnd";
+
+const taskTarget = {
+  drop(props, monitor) {
+    const item = monitor.getItem();
+    const targetListId = props.listId;
+    const sourceListId = item.listId;
+
+    if (targetListId === sourceListId) {
+      return; // Shouldn't allow drop in the same list.
+    }
+
+    const deleteEvent = new Event("deleteTaskFromList");
+    deleteEvent.detail = { listId: sourceListId, taskId: item.id };
+
+    const addEvent = new Event("addTaskToList");
+    addEvent.detail = { listId: targetListId, taskName: item.taskName };
+
+    window.dispatchEvent(deleteEvent);
+    window.dispatchEvent(addEvent);
+  }
+};
+
+function collect(connect, monitor) {
+  return {
+    connectDropTarget: connect.dropTarget(),
+    isOver: monitor.isOver()
+  };
+}
+
 class List extends Component {
   state = {
     taskNames: []
+  };
+
+  componentWillMount = () => {
+    this.addListener("deleteTaskFromList");
+    this.addListener("addTaskToList");
+  };
+
+  addListener = eventName => {
+    window.addEventListener(eventName, e => {
+      const listId = this.props.listId;
+      const eventData = e.detail;
+      if (listId === eventData.listId) {
+        const taskNames = [...this.state.taskNames];
+        eventName === "addTaskToList"
+          ? taskNames.push(eventData.taskName)
+          : taskNames.splice(eventData.taskId, 1);
+        this.setState({ taskNames });
+      }
+    });
   };
 
   showCloseIcon = (e, isHeading) => {
@@ -48,7 +97,7 @@ class List extends Component {
       input.className = "hide";
       element.className = "show";
       button.className = "hide";
-    }, 100);
+    }, 200);
   };
 
   hideInputBox = e => {
@@ -112,10 +161,12 @@ class List extends Component {
   };
 
   render() {
+    const { connectDropTarget, isOver, children } = this.props;
     let tasks = [];
     for (let i = 0; i < this.props.list.numOfTasks; i++) {
       tasks.push(
         <Task
+          listId={this.props.listId}
           key={i}
           index={i}
           showCloseIcon={this.showCloseIcon}
@@ -134,7 +185,11 @@ class List extends Component {
         className="add task"
         key={this.props.list.numOfTasks}
         href="#"
-        onClick={() => this.props.onTaskAddition(this.props.list)}
+        onClick={() => {
+          this.props.onTaskAddition(this.props.list);
+          const taskNames = this.state.taskNames;
+          this.setState({ taskNames });
+        }}
       >
         <span className="icon-add" />
         Click to add task
@@ -143,7 +198,7 @@ class List extends Component {
 
     tasks.push(addTaskLink);
 
-    const list = (
+    const list = connectDropTarget(
       <div className="list">
         <div
           className="heading"
@@ -174,4 +229,4 @@ class List extends Component {
   }
 }
 
-export default List;
+export default DropTarget("task", taskTarget, collect)(List);

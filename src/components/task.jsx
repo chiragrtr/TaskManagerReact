@@ -1,7 +1,32 @@
 import React, { Component } from "react";
+import { DragSource } from "react-dnd";
+
+const taskSource = {
+  beginDrag(props) {
+    return {
+      id: props.index,
+      listId: props.listId,
+      taskName: props.taskName
+    };
+  }
+};
+
+function collect(connect, monitor) {
+  return {
+    connectDragSource: connect.dragSource(),
+    isDragging: monitor.isDragging()
+  };
+}
+
 class Task extends Component {
   render() {
-    return (
+    const {
+      taskName,
+      isDragging,
+      connectDragSource,
+      connectDropTarget
+    } = this.props;
+    return connectDragSource(
       <div
         className="task"
         onMouseOver={this.props.showCloseIcon}
@@ -33,4 +58,4 @@ class Task extends Component {
   }
 }
 
-export default Task;
+export default DragSource("task", taskSource, collect)(Task);
